@@ -25,8 +25,6 @@ public:
     void setPrev(Node* newPrev) { this->prev = newPrev; }
     void setNext(Node* newNext) { this->next = newNext; }
 
-
-
     // Debugging print function (prints node data neatly)
     void print() const {
         std::cout << "Node(" << this->data << ")";
@@ -157,9 +155,7 @@ public:
         return new Node(val);
     }
 
-    /*
-     *  Iterate through the list and print each node.
-     */
+    // Iterate through the list and print each node.
     void print() {
         Node* printp = this->head;
         while(printp != nullptr) {
@@ -167,11 +163,104 @@ public:
             printp = printp->getNext();
         }
     }
+
+    // Delete all elements in the list.
+    void clear() {
+        Node* next;
+
+        if(this->size == 0) return;
+        do {
+            next = this->head->getNext();
+            delete(this->head);
+            this->setHead(next);
+        } while(next != nullptr);
+    }
 };
 
-// class Stack {
+/*
+ *  Implementation of Stack for char nodes.
+ *
+ *  Must create an empty Stack and then add
+ *  any nodes to it.
+ */
+class Stack {
+private:
+    Node* top;
+    size_t depth;
 
-// };
+public:
+    // Constructor
+    Stack(): top(nullptr), depth(0) {}
+
+    // Getters
+    Node* getTop() const { return this->top; }
+    size_t getDepth() const { return this->depth; }
+
+    // Setters
+    void setTop(Node* newTop) { this->top = newTop; }
+    void setDepth(Node* newDepth) { this->top = newDepth; }
+
+    // Push a new node to the top of the stack
+    void push(Node* x) {
+        if(isEmpty()) top = x; // Empty stack handling
+        else {
+            // Set input as new top
+            x->setNext(top);
+            top->setPrev(x);
+            this->setTop(x);
+        }
+        depth++;
+        return;
+    }
+
+    /*
+     *  Delete the top of the stack and return a copy.
+     *  If there is no top, return a nullptr.
+     */
+    Node* pop() {
+        if(isEmpty()) return nullptr; // Stack is empty
+
+        Node* popped = this->getTop();
+        this->setTop(this->getTop()->getNext());
+        // Set the new top's previous
+        if(this->getTop() != nullptr) this->getTop()->setPrev(nullptr);
+        this->depth--;
+        return popped;
+    }
+
+    // Functionally the same as getTop
+    Node* peek() const { return this->getTop(); }
+
+    bool isEmpty() {
+        return this->depth == 0;
+    }
+
+    // Not sure why this is in the documentation,
+    // a stack with a linked list is inherently dynamically
+    // allocated, and therefore won't be full until
+    // there is no room in memory.
+    // bool isFull() {
+
+    // }
+
+    void print() {
+        Node* cur = this->getTop();
+        while(cur != nullptr) {
+            cur->print();
+            cur = cur->getNext();
+        }
+        return;
+    }
+
+    // Clear the stack of all nodes.
+    void clear() {
+        while(isEmpty() == false) {
+            // pop until empty
+            this->pop();
+        }
+        return;
+    }
+};
 
 // class Queue {
 
@@ -186,17 +275,33 @@ public:
 // };
 
 int main() {
-    Node* first = new Node('a');
-    Node* second = new Node('b');
-    Node* third = new Node('c');
+    // Array of Nodes for unit testing
+    Node* nodeArray[] {     new Node('1'), new Node('2'), new Node('3'),
+                            new Node('4'), new Node('5'), new Node('6'), };
 
-    LinkedList myList = LinkedList();
-    myList.add(0, first);
-    myList.add(1, second);
-    myList.add(2, third);
-    myList.print();
-    myList.remove(1);
-    myList.print();
+    // The unit tests below no doubt are not
+    // "proper" for true unit testing. I have
+    // no doubt asserts would be preferable,
+    // but given the scope of this assignment
+    // I kind of can't be bothered. Oh, well!
+
+    // List testing
+    // LinkedList myList = LinkedList();
+    // for(int i = 0; i < (sizeof(nodeArray) / sizeof(nodeArray[0])); i++) {
+    //     myList.add(i, nodeArray[i]);
+    // }
+    // myList.print();
+    // myList.remove(3);
+    // myList.print();
+
+    // Stack testing
+    // Stack myStack = Stack();
+    // for(int i = 0; i < (sizeof(nodeArray) / sizeof(nodeArray[0])); i++) {
+    //     myStack.push(nodeArray[i]);
+    // }
+    // myStack.print();
+    // myStack.clear();
+    // myStack.print();
 
     return 0;
 }

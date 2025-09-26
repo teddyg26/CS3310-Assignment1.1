@@ -31,6 +31,7 @@ public:
         if (prev) std::cout << " prev: " << this->prev->data;
         if (next) std::cout << " next: " << this->next->data;
         std::cout << std::endl;
+        return;
     }
 };
 
@@ -44,12 +45,12 @@ class LinkedList {
 private:
     Node* head;
     Node* tail;
-    // int capacity;
     size_t size;
 
 public:
     // Constructor
     LinkedList(): head(nullptr), tail(nullptr), size(0) {}
+    ~LinkedList() { clear(); }
 
     // Getters
     Node* getHead() const { return this->head; }
@@ -87,6 +88,7 @@ public:
             this->setTail(toAdd);
         }
         this->size++;
+        return;
     }
 
     // Push to the front of the linked list
@@ -99,6 +101,7 @@ public:
             this->setHead(toAdd);
         }
         this->size++;
+        return;
     }
 
     // Add node x at index i
@@ -162,6 +165,7 @@ public:
             printp->print();
             printp = printp->getNext();
         }
+        return;
     }
 
     // Delete all elements in the list.
@@ -174,6 +178,7 @@ public:
             delete(this->head);
             this->setHead(next);
         } while(next != nullptr);
+        return;
     }
 };
 
@@ -191,6 +196,7 @@ private:
 public:
     // Constructor
     Stack(): top(nullptr), depth(0) {}
+    ~Stack() { clear(); }
 
     // Getters
     Node* getTop() const { return this->top; }
@@ -262,9 +268,65 @@ public:
     }
 };
 
-// class Queue {
+/*
+ *  Implementation of Queue for char nodes
+ *
+ *  Following previous implementations here,
+ *  this queue  will be empty and must be
+ *  added to after construction.
+ */
+class Queue {
+private:
+    Node* front;
+    Node* rear;
+    size_t len;
 
-// };
+public:
+    // Constructor
+    Queue(): front(nullptr), rear(nullptr), len(0) {}
+    ~Queue() { clear(); };
+
+    // Getters
+    Node* getFront() { return this->front; }
+    Node* getRear() { return this->rear; }
+    size_t getLen() { return this->len; }
+
+    // Setters
+    void setFront(Node* newFront) { this->front = newFront; }
+    void setRear(Node* newRear) { this->rear = newRear; }
+    void setLen(size_t newLen) { this->len = newLen; }
+
+    // Returns Boolean of whether queue is currently empty
+    bool isEmpty() {
+        return 0;
+    }
+
+    // Adds item to front of queue
+    void enqueue(Node* x) {
+        return;
+    }
+
+    // Removes item from rear of queue and returns it
+    // Returns a nullptr if the queue is empty
+    Node* dequeue() {
+        if(isEmpty()) return nullptr;
+        return nullptr;
+    }
+
+    // Check the end of the queue without removing
+    Node* poll() {
+        return nullptr;
+    }
+
+    void print() {
+        return;
+    }
+
+    // Clear the queue of all nodes
+    void clear() {
+        return;
+    }
+};
 
 // class StackParenthesesChecker {
 
@@ -305,3 +367,15 @@ int main() {
 
     return 0;
 }
+
+/*
+ *  NOTE: ChatGPT and Google Gemini were used as tools along with posts on
+ *  StackOverflow to both get the C++ compiler running on my MacBook
+ *  (M1 MacBook Air) and to quickly gain an understanding of syntax
+ *  conventions in the C++ language (as well as some convenient 
+ *  features for using OOP). It was not, however, used to copy paste code
+ *  as many students have been doing. I hope this will be understandable
+ *  to you (Dr. Rhodes), given this IS my first time coding in C++.
+ * 
+ *  -teddyg
+ */

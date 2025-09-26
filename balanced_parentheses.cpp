@@ -182,6 +182,14 @@ public:
     }
 };
 
+
+// This is about the point where the file length
+// is making me hate myself
+//
+// Oh well! not like separating into different files
+// will lend to performance gains
+
+
 /*
  *  Implementation of Stack for char nodes.
  *
@@ -298,11 +306,18 @@ public:
 
     // Returns Boolean of whether queue is currently empty
     bool isEmpty() {
-        return 0;
+        return this->getLen() == 0;
     }
 
     // Adds item to front of queue
     void enqueue(Node* x) {
+		if(isEmpty()) this->front = this->rear = x;
+		else {
+			this->getRear()->setNext(x);
+			x->setPrev(this->getRear());
+			this->setRear(x);
+		}
+		this->len++;
         return;
     }
 
@@ -314,8 +329,9 @@ public:
     }
 
     // Check the end of the queue without removing
+	// Functionally the same as getRear()
     Node* poll() {
-        return nullptr;
+        return this->getRear();
     }
 
     void print() {
@@ -324,6 +340,9 @@ public:
 
     // Clear the queue of all nodes
     void clear() {
+		while(isEmpty() == false) {
+			this->dequeue();
+		}
         return;
     }
 };
@@ -340,6 +359,19 @@ int main() {
     // Array of Nodes for unit testing
     Node* nodeArray[] {     new Node('1'), new Node('2'), new Node('3'),
                             new Node('4'), new Node('5'), new Node('6'), };
+
+    // TODO: Implement user input that takes an arbitrary
+    // line of parentheses ['('], [')'] and processes them to
+    // see if they are balanced or not (each open bracket
+	// has a matching closed bracket).
+	//
+	// EX: "((())())()" ✔︎		"))()" ✘	"(()))" ✘
+
+	/*
+	*========================================================
+	*		UNIT TESTING
+	*========================================================
+	*/
 
     // The unit tests below no doubt are not
     // "proper" for true unit testing. I have

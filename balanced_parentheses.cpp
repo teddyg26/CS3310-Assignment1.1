@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <cassert>
 
 /*
  *  Class for nodes in a linked list that contain singular chars
@@ -220,7 +221,7 @@ public:
         else {
             // Set input as new top
             x->setNext(top);
-            top->setPrev(x);
+            this->getTop()->setPrev(x);
             this->setTop(x);
         }
         depth++;
@@ -243,7 +244,7 @@ public:
     }
 
     // Functionally the same as getTop
-    Node* peek() const { return this->getTop(); }
+    Node* peek() const { return this->top; }
 
     bool isEmpty() {
         return this->depth == 0;
@@ -309,7 +310,7 @@ public:
         return this->getLen() == 0;
     }
 
-    // Adds item to front of queue
+    // Adds item to rear of queue
     void enqueue(Node* x) {
 		if(isEmpty()) this->front = this->rear = x;
 		else {
@@ -321,20 +322,32 @@ public:
         return;
     }
 
-    // Removes item from rear of queue and returns it
+    // Removes item from front of queue and returns it
     // Returns a nullptr if the queue is empty
     Node* dequeue() {
         if(isEmpty()) return nullptr;
-        return nullptr;
+
+		// Store a temp node to hold the value of the front.
+		// Delete the front of the queue, then set the new front
+		// and return the temp node.
+		Node* returnNode = this->getFront();
+		this->setFront(returnNode->getNext());
+		if(this->getFront()) this->getFront()->setPrev(nullptr);
+		else this->setRear(nullptr); // In this else, the Queue is empty
+		this->len--;
+        return returnNode;
     }
 
     // Check the end of the queue without removing
 	// Functionally the same as getRear()
-    Node* poll() {
-        return this->getRear();
-    }
+    Node* poll() { return this->rear; }
 
     void print() {
+		Node* cur = this->getFront();
+		while(cur != nullptr) {
+			cur->print();
+			cur = cur->getNext();
+		}
         return;
     }
 
@@ -347,25 +360,187 @@ public:
     }
 };
 
-// class StackParenthesesChecker {
+// As with other classes, needs to have a stack
+// added with the setStack method after construction
+class StackParenthesesChecker {
+private:
+	Stack* stack;
+public:
+	// Constructor
+	StackParenthesesChecker(): stack(nullptr) {}
 
-// };
+	// Getter
+	Stack* getStack() const {
+		return this->stack;
+	}
 
-// class QueueParenthesesChecker {
+	// Setter
+	void setStack(Stack* newStack) {
+		this->stack = newStack;
+		return;
+	}
 
-// };
+	bool isBalanced(std::string s) {
+		// Since every open bracket will have a
+		// matching closing bracket, the input
+		// string _must_ be even in length to
+		// meet the criteria of being balanced.
+		if(s.length() % 2 != 0) return false;
+
+		// Load stack with characters in string
+		for(int i = 0; i < s.length(); i++) {
+			Node* node = new Node(s[i]);
+			this->getStack()->push(node);
+		}
+
+		// Check the string for the solution using a queue.
+		// This will be done by dequeue-ing one item at a time.
+		// If the item is a '(', increment the counter by one.
+		// If the item is a ')', decrement the counter by one.
+		// If at any time the counter is positive, the input is unbalanced.
+		// This is because stacks are FILO, so ')' are counted first.
+		// If the counter is non-zero at the end, the input is unbalanced.
+		int count = 0;
+		Node* cur;
+		size_t numIterations = this->getStack()->getDepth();
+		for(int i = 0; i < numIterations; i++) {
+			cur = this->getStack()->pop();
+			if(cur->getData() == '(') count++;
+			if(cur->getData() == ')') count--;
+			if(count > 0) return false;
+		}
+
+		return count == 0;
+	}
+};
+
+// As with other classes, needs to have a queue
+// added with the setQueue method after construction
+class QueueParenthesesChecker {
+private:
+	Queue* queue;
+public:
+	// Constructor
+	QueueParenthesesChecker(): queue(nullptr) {}
+
+	// Getter
+	Queue* getQueue() const {
+		return this->queue;
+	}
+
+	// Setter
+	void setQueue(Queue* newQueue) {
+		this->queue = newQueue;
+		return;
+	}
+
+	bool isBalanced(std::string s) {
+		// Since every open bracket will have a
+		// matching closing bracket, the input
+		// string _must_ be even in length to
+		// meet the criteria of being balanced.
+		if(s.length() % 2 != 0) return false;
+
+		// Load queue with characters in string
+		for(int i = 0; i < s.length(); i++) {
+			Node* node = new Node(s[i]);
+			this->getQueue()->enqueue(node);
+		}
+
+		// Check the string for the solution using a queue.
+		// This will be done by dequeue-ing one item at a time.
+		// If the item is a '(', increment the counter by one.
+		// If the item is a ')', decrement the counter by one.
+		// If at any time the counter is negative, the input is unbalanced.
+		// This is the inverse of a stack since Queues are FIFO and stacks are FILO.
+		// If the counter is non-zero at the end, the input is unbalanced.
+		int count = 0;
+		Node* cur;
+		size_t numIterations = this->getQueue()->getLen();
+		for(int i = 0; i < numIterations; i++) {
+			cur = this->getQueue()->dequeue();
+			if(cur->getData() == '(') count++;
+			if(cur->getData() == ')') count--;
+			if(count < 0) return false;
+		}
+
+		return count == 0;
+	}
+};
+
+// Iterate through a given string to validate if it is
+// a good input for the problem.
+bool checkInputStr(std::string str) {
+	for(int i = 0; i < str.length(); i++) {
+		if(str[i] != '(' && str[i] != ')') return false;
+	}
+	return true;
+}
 
 int main() {
-    // Array of Nodes for unit testing
-    Node* nodeArray[] {     new Node('1'), new Node('2'), new Node('3'),
-                            new Node('4'), new Node('5'), new Node('6'), };
-
     // TODO: Implement user input that takes an arbitrary
     // line of parentheses ['('], [')'] and processes them to
     // see if they are balanced or not (each open bracket
 	// has a matching closed bracket).
 	//
 	// EX: "((())())()" ✔︎		"))()" ✘	"(()))" ✘
+
+	// Initialize checkers
+	StackParenthesesChecker checkerStack = StackParenthesesChecker();
+	QueueParenthesesChecker checkerQueue = QueueParenthesesChecker();
+	Stack* myStack = new Stack();
+	Queue* myQueue = new Queue();
+	checkerStack.setStack(myStack);
+	checkerQueue.setQueue(myQueue);
+
+	// Asserts to ensure program is functioning
+	assert(checkerStack.isBalanced("((())())()"));
+	assert(checkerQueue.isBalanced("((())())()"));
+
+	assert(!checkerStack.isBalanced("))()"));
+	assert(!checkerQueue.isBalanced("))()"));
+
+	assert(!checkerStack.isBalanced("(()))"));
+	assert(!checkerQueue.isBalanced("(()))"));
+
+	
+
+	// USER INPUT SECTION
+	std::string userStr;
+
+	// Take first user input, then all future inputs
+	// are taken from within the while loop. The user
+	// enters 'q' or 'Q' when they want to stop the program.
+	std::cout << "Input string of parentheses (or 'q' to quit): ";
+	std::getline(std::cin, userStr);
+	while(std::tolower(userStr[0]) != 'q') {
+		// Start by checking user's input for validity
+		if(!checkInputStr(userStr)) {
+			std::cout << "Invalid input." << std::endl;
+			std::cout << "Input string of parentheses (or 'q' to quit): ";
+			std::getline(std::cin, userStr);
+			continue;
+		}
+
+		// Check user input with both stack & queue, then
+		// output if it cleared either.
+		bool stackClear = checkerStack.isBalanced(userStr);
+		bool queueClear = checkerQueue.isBalanced(userStr);
+
+		if(stackClear) std::cout << "Input is balanced with stack." << std::endl;
+		else std::cout << "Input is not balanced with stack." << std::endl;
+
+		if(queueClear) std::cout << "Input is balanced with queue." << std::endl;
+		else std::cout << "Input is not balanced with queue." << std::endl;
+
+		// Clear checker's and take new user input.
+		checkerStack.getStack()->clear();
+		checkerQueue.getQueue()->clear();
+		std::cout << "Input string of parentheses (or 'q' to quit): ";
+		std::getline(std::cin, userStr);
+	}
+
+
 
 	/*
 	*========================================================
@@ -379,7 +554,12 @@ int main() {
     // but given the scope of this assignment
     // I kind of can't be bothered. Oh, well!
 
-    // List testing
+
+	// // Array of Nodes for unit testing
+    // Node* nodeArray[] {     new Node('1'), new Node('2'), new Node('3'),
+    //                         new Node('4'), new Node('5'), new Node('6'), };
+
+    // // List testing
     // LinkedList myList = LinkedList();
     // for(int i = 0; i < (sizeof(nodeArray) / sizeof(nodeArray[0])); i++) {
     //     myList.add(i, nodeArray[i]);
@@ -388,7 +568,7 @@ int main() {
     // myList.remove(3);
     // myList.print();
 
-    // Stack testing
+    // // Stack testing
     // Stack myStack = Stack();
     // for(int i = 0; i < (sizeof(nodeArray) / sizeof(nodeArray[0])); i++) {
     //     myStack.push(nodeArray[i]);
@@ -396,6 +576,17 @@ int main() {
     // myStack.print();
     // myStack.clear();
     // myStack.print();
+
+	// // Queue testing
+	// Queue myQueue = Queue();
+	// for(int i = 0; i < (sizeof(nodeArray) / sizeof(nodeArray[0])); i++) {
+    //     myQueue.enqueue(nodeArray[i]);
+    // }
+	// myQueue.print();
+	// Node* removed = myQueue.dequeue();
+	// removed->print();
+	// removed = myQueue.dequeue();
+	// removed->print();
 
     return 0;
 }
